@@ -11,6 +11,7 @@ pub use self::socket::SocketError;
 use crate::protocol::{Metadata, Transaction};
 use crate::uri::Uri;
 use ethers_core::types::{Address, Bytes, Signature, H256};
+use ethers_core::utils::keccak256;
 use std::path::PathBuf;
 use web3::signing;
 use web3::types::Recovery;
@@ -63,11 +64,13 @@ impl Client {
     }
 }
 
-pub fn verify_sig(message_hash: &str, sig: &str) -> Result<Address, Box<dyn std::error::Error>> {
+pub fn verify_sig(msg: &str, sig: &str) -> Result<Address, Box<dyn std::error::Error>> {
+    let message_hash = keccak256(msg.as_bytes());
+
     let r = Recovery::from_raw_signature(message_hash, sig)?;
 
     let address = signing::recover(
-        message_hash.as_bytes(),
+        message_hash.as_ref(),
         sig.as_bytes(),
         r.recovery_id().unwrap(),
     )?;
