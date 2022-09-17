@@ -58,22 +58,18 @@ impl Client {
         Ok(sig.as_ref().try_into().unwrap())
     }
 
-    pub async fn verify_sig(
-        &self,
-        message_hash: &str,
-        sig: &str,
-    ) -> Result<Address, Box<dyn std::error::Error>> {
-        let r = Recovery::from_raw_signature(message_hash, sig)?;
-
-        let address = signing::recover(
-            message_hash.as_bytes(),
-            sig.as_bytes(),
-            r.recovery_id().unwrap(),
-        )?;
-        Ok(address)
-    }
-
     pub fn close(self) -> Result<(), SocketError> {
         self.connection.close()
     }
+}
+
+pub fn verify_sig(message_hash: &str, sig: &str) -> Result<Address, Box<dyn std::error::Error>> {
+    let r = Recovery::from_raw_signature(message_hash, sig)?;
+
+    let address = signing::recover(
+        message_hash.as_bytes(),
+        sig.as_bytes(),
+        r.recovery_id().unwrap(),
+    )?;
+    Ok(address)
 }
