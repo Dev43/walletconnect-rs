@@ -6,7 +6,7 @@ mod protocol;
 #[cfg(feature = "qr")]
 pub mod qr;
 mod serialization;
-#[cfg(feature = "transport")]
+// #[cfg(feature = "transport")]
 pub mod transport;
 mod uri;
 

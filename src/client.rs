@@ -12,6 +12,8 @@ use crate::protocol::{Metadata, Transaction};
 use crate::uri::Uri;
 use ethers_core::types::{Address, Bytes, Signature, H256};
 use std::path::PathBuf;
+use web3::signing;
+use web3::types::Recovery;
 
 #[derive(Debug)]
 pub struct Client {
@@ -54,6 +56,21 @@ impl Client {
     pub async fn personal_sign(&self, data: &[&str]) -> Result<Signature, CallError> {
         let sig = self.connection.personal_sign(data).await?;
         Ok(sig.as_ref().try_into().unwrap())
+    }
+
+    pub async fn verify_sig(
+        &self,
+        message_hash: &str,
+        sig: &str,
+    ) -> Result<Address, Box<dyn std::error::Error>> {
+        let r = Recovery::from_raw_signature(message_hash, sig)?;
+
+        let address = signing::recover(
+            message_hash.as_bytes(),
+            sig.as_bytes(),
+            r.recovery_id().unwrap(),
+        )?;
+        Ok(address)
     }
 
     pub fn close(self) -> Result<(), SocketError> {

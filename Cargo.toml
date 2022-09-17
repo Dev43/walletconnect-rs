@@ -13,7 +13,7 @@ WalletConnect client implementation in Rust.
 """
 
 [features]
-default = []
+default = ["web3"]
 qr = ["atty", "qrcode", "termcolor", "terminfo"]
 transport = ["web3"]
 
