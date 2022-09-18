@@ -14,4 +14,5 @@ pub use client::Client;
 pub use protocol::*;
 pub use uri::Uri;
 
+pub use ethers_core;
 pub use hex_literal::hex;
