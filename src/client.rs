@@ -64,15 +64,43 @@ impl Client {
     }
 }
 
-pub fn verify_sig(msg: &str, sig: &str) -> Result<Address, Box<dyn std::error::Error>> {
+pub fn verify_sig(msg: &str, sig: &[u8]) -> Result<String, Box<dyn std::error::Error>> {
+    let (sig, r) = Recovery::from_raw_signature(msg, sig)
+        .unwrap()
+        .as_signature()
+        .unwrap();
+
     let message_hash = keccak256(msg.as_bytes());
 
-    let r = Recovery::from_raw_signature(message_hash, sig)?;
+    let address = signing::recover(message_hash.as_ref(), &sig, r)?;
+    Ok(format!("{:?}", address))
+}
 
-    let address = signing::recover(
-        message_hash.as_ref(),
-        sig.as_bytes(),
-        r.recovery_id().unwrap(),
-    )?;
-    Ok(address)
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use hex_literal::hex;
+
+    #[test]
+    fn recovery_signature() {
+        // let msg = "Some data";
+        let msg_hash = "1da44b586eb0729ff70a73c326926f6ed5a25f5b056e7f47fbc6e58d86871655";
+        let sig=   hex!("b91467e570a6466aa9e9876cbcd013baba02900b8979d43fe208a4a4f339f5fd6007e74cd82e037b800186422fc2da167c747ef045e5d18a5f5d4300f8e1a0291c");
+
+        let addr = match verify_sig(msg_hash, &sig) {
+            Ok(addr) => {
+                println!("{}", addr);
+                addr
+            }
+            Err(e) => {
+                println!("{}", e);
+                panic!("{}", e.to_string());
+            }
+        };
+        assert_eq!(
+            addr,
+            "0x08901d616dad14aa9a8c5196591acd44ab827afd".to_string()
+        );
+    }
 }

@@ -108,8 +108,8 @@ pub mod emptynoneaddress {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ethereum_types::H160;
     use serde_json::json;
+    use web3::types::H160;
 
     #[test]
     fn deserializes_empty_none_address() {

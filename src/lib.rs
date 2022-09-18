@@ -13,3 +13,5 @@ mod uri;
 pub use client::Client;
 pub use protocol::*;
 pub use uri::Uri;
+
+pub use hex_literal::hex;
